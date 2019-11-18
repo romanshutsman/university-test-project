@@ -1,50 +1,48 @@
-import React, { Component } from "react";
-import withFirebaseAuth from "react-with-firebase-auth";
-import * as firebase from "firebase";
+import React, { Component } from 'react';
+import withFirebaseAuth from 'react-with-firebase-auth';
+import * as firebase from 'firebase';
 
-import "firebase/auth";
-import firebaseConfig from "./firebaseConfig";
-import logo from "./logo.svg";
-import "./App.css";
-import Button from "@material-ui/core/Button";
-import SignIn from "./SignIn";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
-import Input from "@material-ui/core/Input";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
-import SwipeableViews from "react-swipeable-views";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import Box from "@material-ui/core/Box";
-import PropTypes from "prop-types";
-import CheckIcon from "@material-ui/icons/Check";
-import CloseIcon from "@material-ui/icons/Close";
+import 'firebase/auth';
+import firebaseConfig from './firebaseConfig';
+import './App.css';
+import Button from '@material-ui/core/Button';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Input from '@material-ui/core/Input';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import SwipeableViews from 'react-swipeable-views';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Box from '@material-ui/core/Box';
+import PropTypes from 'prop-types';
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
 class App extends Component {
   state = {
-    email: "",
-    password: "",
+    email: '',
+    password: '',
     error: null,
     stride_abbr: [],
     model_offender: [],
     model_treats: [],
     defense: [],
     tab: 0,
-    index: 0
+    index: 0,
+    activeModel: false,
+    activeStride: false
   };
 
   handleChange = (event, newValue) => {
-    this.setState({ tab: newValue });
+    this.setState({ tab: newValue, activeModel: false, activeStride: false });
   };
 
   handleChangeIndex = index => {
@@ -62,42 +60,35 @@ class App extends Component {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(user => {
-        console.log(user);
-        // this.props.history.push('/');
       })
       .catch(error => {
-        console.log(error);
         this.setState({ error: error });
       });
   };
   componentDidMount() {
     const db = firebaseApp.firestore();
-    db.collection("stride_abbr")
+    db.collection('stride_abbr')
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
-        console.log(data); // array of cities objects
         this.setState({ stride_abbr: data });
       });
-    db.collection("model_offender")
+    db.collection('model_offender')
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
-        console.log(data); // array of cities objects
         this.setState({ model_offender: data });
       });
-    db.collection("model_treats")
+    db.collection('model_treats')
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
-        console.log(data); // array of cities objects
         this.setState({ model_treats: data });
       });
-    db.collection("defense")
+    db.collection('defense')
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
-        console.log(data); // array of cities objects
         this.setState({ defense: data });
       });
   }
@@ -172,6 +163,12 @@ class App extends Component {
                                 </TableCell>
                                 <TableCell align="center">{row.abbr}</TableCell>
                                 <TableCell align="center">{row.desc}</TableCell>
+                                <TableCell align="center">
+                                  {row.random}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {row.malicious}
+                                </TableCell>
                               </TableRow>
                             );
                           })}
@@ -181,12 +178,27 @@ class App extends Component {
                           .filter((el, i) => i !== 0)
                           .map((row, i) => {
                             return (
-                              <TableRow key={row.desc}>
+                              <TableRow
+                                key={row.desc}
+                                style={{
+                                  background: row.letter.includes(
+                                    this.state.activeStride
+                                  )
+                                    ? '#dc7575'
+                                    : 'initial'
+                                }}
+                              >
                                 <TableCell component="th" scope="row">
                                   {row.letter}
                                 </TableCell>
                                 <TableCell align="center">{row.abbr}</TableCell>
                                 <TableCell align="center">{row.desc}</TableCell>
+                                <TableCell align="center">
+                                  {row.random}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {row.malicious}
+                                </TableCell>
                               </TableRow>
                             );
                           })}
@@ -200,7 +212,16 @@ class App extends Component {
                       <TableBody>
                         {model_offender.map((row, i) => {
                           return (
-                            <TableRow key={row.desc}>
+                            <TableRow
+                              key={row.desc}
+                              style={{
+                                background: row.name.includes(
+                                  this.state.activeModel
+                                )
+                                  ? '#dc7575'
+                                  : 'initial'
+                              }}
+                            >
                               <TableCell align="center">{row.name}</TableCell>
                               <TableCell align="center">{row.desc}</TableCell>
                             </TableRow>
@@ -235,6 +256,14 @@ class App extends Component {
                                   <div className="wrapper-check">
                                     {row.threats.map(letter => (
                                       <span
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => {
+                                          this.setState({
+                                            tab: 0,
+                                            index: 0,
+                                            activeStride: letter
+                                          });
+                                        }}
                                         key={`${Math.random()}`}
                                         className="letter-header"
                                       >
@@ -262,7 +291,17 @@ class App extends Component {
                                 <TableCell align="center">
                                   {row.descAS}
                                 </TableCell>
-                                <TableCell align="center">
+                                <TableCell
+                                  style={{ cursor: 'pointer' }}
+                                  align="center"
+                                  onClick={() => {
+                                    this.setState({
+                                      tab: 1,
+                                      index: 1,
+                                      activeModel: row.offender
+                                    });
+                                  }}
+                                >
                                   {row.offender}
                                 </TableCell>
                                 <TableCell align="center">
@@ -313,7 +352,18 @@ class App extends Component {
                           .map((row, i) => {
                             return (
                               <TableRow key={row.way}>
-                                <TableCell component="th" scope="row">
+                                <TableCell
+                                  style={{ cursor: 'pointer' }}
+                                  component="th"
+                                  scope="row"
+                                  onClick={() => {
+                                    this.setState({
+                                      tab: 0,
+                                      index: 0,
+                                      activeStride: row.let
+                                    });
+                                  }}
+                                >
                                   {row.let}
                                 </TableCell>
                                 <TableCell align="center">
@@ -337,7 +387,7 @@ class App extends Component {
               <h1>Комплексна Лабораторна робота:</h1>
               <h1>Методологія STRIDE</h1>
               {this.state.error && <p>{this.state.error.message}</p>}
-              <h4></h4>
+              <br />
               <form onSubmit={this.handleSubmit}>
                 <Input
                   type="text"
@@ -390,12 +440,6 @@ TabPanel.propTypes = {
   value: PropTypes.any.isRequired
 };
 
-function a11yProps(index) {
-  return {
-    id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`
-  };
-}
 const firebaseAppAuth = firebaseApp.auth();
 
 const providers = {
