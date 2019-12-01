@@ -1,40 +1,41 @@
-import React, { Component } from 'react';
-import withFirebaseAuth from 'react-with-firebase-auth';
-import * as firebase from 'firebase';
+import React, { Component } from "react";
+import withFirebaseAuth from "react-with-firebase-auth";
+import * as firebase from "firebase";
 
-import 'firebase/auth';
-import firebaseConfig from './firebaseConfig';
-import './App.css';
-import Button from '@material-ui/core/Button';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Input from '@material-ui/core/Input';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import SwipeableViews from 'react-swipeable-views';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Box from '@material-ui/core/Box';
-import PropTypes from 'prop-types';
-import CheckIcon from '@material-ui/icons/Check';
-import CloseIcon from '@material-ui/icons/Close';
+import "firebase/auth";
+import firebaseConfig from "./firebaseConfig";
+import "./App.css";
+import Button from "@material-ui/core/Button";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import Input from "@material-ui/core/Input";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Paper from "@material-ui/core/Paper";
+import SwipeableViews from "react-swipeable-views";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Box from "@material-ui/core/Box";
+import PropTypes from "prop-types";
+import CheckIcon from "@material-ui/icons/Check";
+import CloseIcon from "@material-ui/icons/Close";
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
 class App extends Component {
   state = {
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     error: null,
     stride_abbr: [],
     model_offender: [],
     model_treats: [],
     defense: [],
+    as: [],
     tab: 0,
     index: 0,
     activeModel: false,
@@ -59,37 +60,42 @@ class App extends Component {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .then(user => {
-      })
+      .then(user => {})
       .catch(error => {
         this.setState({ error: error });
       });
   };
   componentDidMount() {
     const db = firebaseApp.firestore();
-    db.collection('stride_abbr')
+    db.collection("stride_abbr")
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
         this.setState({ stride_abbr: data });
       });
-    db.collection('model_offender')
+    db.collection("model_offender")
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
         this.setState({ model_offender: data });
       });
-    db.collection('model_treats')
+    db.collection("model_treats")
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
         this.setState({ model_treats: data });
       });
-    db.collection('defense')
+    db.collection("defense")
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
         this.setState({ defense: data });
+      });
+    db.collection("as")
+      .get()
+      .then(querySnapshot => {
+        const data = querySnapshot.docs.map(doc => doc.data());
+        this.setState({ as: data });
       });
   }
   render() {
@@ -99,7 +105,8 @@ class App extends Component {
       tab,
       model_offender,
       model_treats,
-      defense
+      defense,
+      as: auto_s
     } = this.state;
     return (
       <div className="App">
@@ -140,6 +147,7 @@ class App extends Component {
                 variant="fullWidth"
                 aria-label="full width tabs example"
               >
+                <Tab label="Автоматизовані Системи" />
                 <Tab label="STRIDE" />
                 <Tab label="Модель Порушників" />
                 <Tab label="Модель Загроз" />
@@ -150,6 +158,51 @@ class App extends Component {
                 onChangeIndex={this.handleChangeIndex}
               >
                 <TabPanel value={tab} index={0}>
+                  <Paper>
+                    <Table size="small" aria-label="a dense table">
+                      <TableHead>
+                        {auto_s
+                          .filter((el, i) => i === 0)
+                          .map((row, i) => {
+                            return (
+                              <TableRow key={row.function}>
+                                <TableCell component="th" scope="row">
+                                  {row.as}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {row.function}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {row.structure}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                      </TableHead>
+                      <TableBody>
+                        {auto_s
+                          .filter((el, i) => i !== 0)
+                          .map((row, i) => {
+                            return (
+                              <TableRow key={row.function + i}>
+                                <TableCell component="th" scope="row">
+                                  {row.as}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {row.function}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <img src={row.structure} alt="structure" />
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                      </TableBody>
+                    </Table>
+                  </Paper>
+                </TabPanel>
+
+                <TabPanel value={tab} index={1}>
                   <Paper>
                     <Table size="small" aria-label="a dense table">
                       <TableHead>
@@ -184,8 +237,8 @@ class App extends Component {
                                   background: row.letter.includes(
                                     this.state.activeStride
                                   )
-                                    ? '#dc7575'
-                                    : 'initial'
+                                    ? "#dc7575"
+                                    : "initial"
                                 }}
                               >
                                 <TableCell component="th" scope="row">
@@ -206,7 +259,7 @@ class App extends Component {
                     </Table>
                   </Paper>
                 </TabPanel>
-                <TabPanel value={tab} index={1}>
+                <TabPanel value={tab} index={2}>
                   <Paper>
                     <Table size="small" aria-label="a dense table">
                       <TableBody>
@@ -218,8 +271,8 @@ class App extends Component {
                                 background: row.name.includes(
                                   this.state.activeModel
                                 )
-                                  ? '#dc7575'
-                                  : 'initial'
+                                  ? "#dc7575"
+                                  : "initial"
                               }}
                             >
                               <TableCell align="center">{row.name}</TableCell>
@@ -231,7 +284,7 @@ class App extends Component {
                     </Table>
                   </Paper>
                 </TabPanel>
-                <TabPanel value={tab} index={2}>
+                <TabPanel value={tab} index={3}>
                   <Paper>
                     <Table size="small" aria-label="a dense table">
                       <TableHead>
@@ -256,7 +309,7 @@ class App extends Component {
                                   <div className="wrapper-check">
                                     {row.threats.map(letter => (
                                       <span
-                                        style={{ cursor: 'pointer' }}
+                                        style={{ cursor: "pointer" }}
                                         onClick={() => {
                                           this.setState({
                                             tab: 0,
@@ -292,7 +345,7 @@ class App extends Component {
                                   {row.descAS}
                                 </TableCell>
                                 <TableCell
-                                  style={{ cursor: 'pointer' }}
+                                  style={{ cursor: "pointer" }}
                                   align="center"
                                   onClick={() => {
                                     this.setState({
@@ -323,7 +376,7 @@ class App extends Component {
                     </Table>
                   </Paper>
                 </TabPanel>
-                <TabPanel value={tab} index={3}>
+                <TabPanel value={tab} index={4}>
                   <Paper>
                     <Table size="small" aria-label="a dense table">
                       <TableHead>
@@ -353,7 +406,7 @@ class App extends Component {
                             return (
                               <TableRow key={row.way}>
                                 <TableCell
-                                  style={{ cursor: 'pointer' }}
+                                  style={{ cursor: "pointer" }}
                                   component="th"
                                   scope="row"
                                   onClick={() => {
