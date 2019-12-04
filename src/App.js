@@ -1,35 +1,35 @@
-import React, { Component } from "react";
-import withFirebaseAuth from "react-with-firebase-auth";
-import * as firebase from "firebase";
+import React, { Component } from 'react';
+import withFirebaseAuth from 'react-with-firebase-auth';
+import * as firebase from 'firebase';
 
-import "firebase/auth";
-import firebaseConfig from "./firebaseConfig";
-import "./App.css";
-import Button from "@material-ui/core/Button";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import Input from "@material-ui/core/Input";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
-import SwipeableViews from "react-swipeable-views";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import Box from "@material-ui/core/Box";
-import PropTypes from "prop-types";
-import CheckIcon from "@material-ui/icons/Check";
-import CloseIcon from "@material-ui/icons/Close";
+import 'firebase/auth';
+import firebaseConfig from './firebaseConfig';
+import './App.css';
+import Button from '@material-ui/core/Button';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Input from '@material-ui/core/Input';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import SwipeableViews from 'react-swipeable-views';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Box from '@material-ui/core/Box';
+import PropTypes from 'prop-types';
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
 class App extends Component {
   state = {
-    email: "",
-    password: "",
+    email: '',
+    password: '',
     error: null,
     stride_abbr: [],
     model_offender: [],
@@ -67,31 +67,31 @@ class App extends Component {
   };
   componentDidMount() {
     const db = firebaseApp.firestore();
-    db.collection("stride_abbr")
+    db.collection('stride_abbr')
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
         this.setState({ stride_abbr: data });
       });
-    db.collection("model_offender")
+    db.collection('model_offender')
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
         this.setState({ model_offender: data });
       });
-    db.collection("model_treats")
+    db.collection('model_treats')
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
         this.setState({ model_treats: data });
       });
-    db.collection("defense")
+    db.collection('defense')
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
         this.setState({ defense: data });
       });
-    db.collection("as")
+    db.collection('as')
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => doc.data());
@@ -237,8 +237,8 @@ class App extends Component {
                                   background: row.letter.includes(
                                     this.state.activeStride
                                   )
-                                    ? "#dc7575"
-                                    : "initial"
+                                    ? '#dc7575'
+                                    : 'initial'
                                 }}
                               >
                                 <TableCell component="th" scope="row">
@@ -271,8 +271,8 @@ class App extends Component {
                                 background: row.name.includes(
                                   this.state.activeModel
                                 )
-                                  ? "#dc7575"
-                                  : "initial"
+                                  ? '#dc7575'
+                                  : 'initial'
                               }}
                             >
                               <TableCell align="center">{row.name}</TableCell>
@@ -305,11 +305,12 @@ class App extends Component {
                                 <TableCell align="center">
                                   {row.offender}
                                 </TableCell>
+                                <TableCell align="center">№ ЖЦ</TableCell>
                                 <TableCell align="center">
                                   <div className="wrapper-check">
                                     {row.threats.map(letter => (
                                       <span
-                                        style={{ cursor: "pointer" }}
+                                        style={{ cursor: 'pointer' }}
                                         onClick={() => {
                                           this.setState({
                                             tab: 0,
@@ -330,14 +331,32 @@ class App extends Component {
                           })}
                       </TableHead>
                       <TableBody>
+                        {model_treats.length > 0 && (
+                          <TableRow>
+                            <TableCell rowSpan={6} component="th" scope="row">
+                              <div
+                                style={{ width: 100 }}
+                              >{`1. ${model_treats[1].life}`}</div>
+                              <div
+                                style={{ width: 100 }}
+                              >{`2. ${model_treats[2].life}`}</div>
+                              <div
+                                style={{ width: 100 }}
+                              >{`3. ${model_treats[3].life}`}</div>
+                              <div
+                                style={{ width: 100 }}
+                              >{`4. ${model_treats[4].life}`}</div>
+                              <div
+                                style={{ width: 100 }}
+                              >{`5. ${model_treats[5].life}`}</div>
+                            </TableCell>
+                          </TableRow>
+                        )}
                         {model_treats
                           .filter((el, i) => i !== 0)
                           .map((row, i) => {
                             return (
                               <TableRow key={row.descAS}>
-                                <TableCell component="th" scope="row">
-                                  {row.life}
-                                </TableCell>
                                 <TableCell align="center">
                                   {row.atsyst}
                                 </TableCell>
@@ -345,7 +364,7 @@ class App extends Component {
                                   {row.descAS}
                                 </TableCell>
                                 <TableCell
-                                  style={{ cursor: "pointer" }}
+                                  style={{ cursor: 'pointer' }}
                                   align="center"
                                   onClick={() => {
                                     this.setState({
@@ -358,15 +377,72 @@ class App extends Component {
                                   {row.offender}
                                 </TableCell>
                                 <TableCell align="center">
-                                  <div className="wrapper-check">
-                                    {row.threats.map((letter, i) => (
-                                      <span
+                                  <div>
+                                    {[1, 2, 3, 4, 5].map(i => (
+                                      <div
+                                        style={{ height: 30 }}
                                         key={`${Math.random()}`}
-                                        className="letter-cell"
                                       >
-                                        {letter ? <CheckIcon /> : <CloseIcon />}
-                                      </span>
+                                        <span key={`${Math.random()}`}>
+                                          {i}
+                                        </span>
+                                      </div>
                                     ))}
+                                  </div>
+                                </TableCell>
+                                <TableCell align="center">
+                                  <div
+                                    className="wrapper-check"
+                                    style={{ flexDirection: 'column' }}
+                                  >
+                                    {row.threats.map((letter, i) => {
+                                      return (
+                                        <div key={`${Math.random()}`}>
+                                          <span className="letter-cell">
+                                            {letter.s ? (
+                                              <CheckIcon />
+                                            ) : (
+                                              <CloseIcon />
+                                            )}
+                                          </span>
+                                          <span className="letter-cell">
+                                            {letter.t ? (
+                                              <CheckIcon />
+                                            ) : (
+                                              <CloseIcon />
+                                            )}
+                                          </span>
+                                          <span className="letter-cell">
+                                            {letter.r ? (
+                                              <CheckIcon />
+                                            ) : (
+                                              <CloseIcon />
+                                            )}
+                                          </span>
+                                          <span className="letter-cell">
+                                            {letter.i ? (
+                                              <CheckIcon />
+                                            ) : (
+                                              <CloseIcon />
+                                            )}
+                                          </span>
+                                          <span className="letter-cell">
+                                            {letter.d ? (
+                                              <CheckIcon />
+                                            ) : (
+                                              <CloseIcon />
+                                            )}
+                                          </span>
+                                          <span className="letter-cell">
+                                            {letter.e ? (
+                                              <CheckIcon />
+                                            ) : (
+                                              <CloseIcon />
+                                            )}
+                                          </span>
+                                        </div>
+                                      );
+                                    })}
                                   </div>
                                 </TableCell>
                               </TableRow>
@@ -406,7 +482,7 @@ class App extends Component {
                             return (
                               <TableRow key={row.way}>
                                 <TableCell
-                                  style={{ cursor: "pointer" }}
+                                  style={{ cursor: 'pointer' }}
                                   component="th"
                                   scope="row"
                                   onClick={() => {
@@ -425,7 +501,11 @@ class App extends Component {
                                 <TableCell align="center">
                                   {row.method}
                                 </TableCell>
-                                <TableCell align="center">{row.way}</TableCell>
+                                <TableCell align="center">
+                                  <ul>
+                                  {row.way.map(el => <li>{el}</li>)}
+                                  </ul>
+                                </TableCell>
                               </TableRow>
                             );
                           })}

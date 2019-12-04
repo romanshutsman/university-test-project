@@ -47,3 +47,6 @@ h1 {
 .wrapper-check {
   display: flex;
 }
+li {
+  text-align: left;
+}
